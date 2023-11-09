@@ -1,0 +1,18 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaylistCraft</title>
+</head>
+<body>
+    <h1>Welcome to PlaylistCraft</h1>
+    <form action="/generate_playlist" method="post">
+        <label for="user_input">Enter your preferences:</label>
+        <input type="text" name="user_input" id="user_input" required>
+        <button type="submit">Generate Playlist</button>
+    </form>
+</body>
+</html>
