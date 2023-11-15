@@ -14,15 +14,93 @@ SPOTIPY_REDIRECT_URI = 'your_redirect_uri'
 # Set up Spotify authentication
 sp_oauth = SpotifyOAuth(SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI, scope='playlist-modify-public')
 
-# Example playlist generation logic (replace with actual logic)
-def generate_playlist(user_input):
-    """Generates a playlist based on the user's input of what type of music they want.
 
-    Args:
-        user_input (str): The text user input describing the playllist they want to generate.
-    """
-    # Implement logic to interact with Spotify API and generate a playlist
-    # ...
+class SpotifyService:
+    def __init__(self, client_id, client_secret, redirect_uri):
+        self.sp_oauth = SpotifyOAuth(client_id, client_secret, redirect_uri, scope='playlist-modify-public')
+        self.sp = Spotify(auth_manager=self.sp_oauth)
+
+    def generate_playlist(self, user_input):
+        """Generates a playlist based on the user's input of what type of music they want.
+
+        Args:
+            user_input (str): The text user input describing the playllist they want to generate.
+        """
+        # Extract user preferences
+        mood = user_input.get('mood', 'happy')  # Default mood is 'happy'
+        genre = user_input.get('genre', 'pop')   # Default genre is 'pop'
+        related_artists = user_input.get('related_artists', [])  # Default is empty list
+
+        # Fetch recommended tracks from Spotify based on user preferences
+        recommended_tracks = self._get_recommended_tracks(mood, genre, related_artists)
+
+        # Create a new playlist and add the recommended tracks
+        playlist_name = f"{mood.capitalize()} {genre.capitalize()} Playlist"
+        playlist_id = self._create_playlist(playlist_name)
+        self._add_tracks_to_playlist(playlist_id, recommended_tracks)
+
+        return playlist_name
+    
+    
+    def _get_recommended_tracks(self, mood, genre, related_artists):
+        """Function _get_recommended_tracks uses the Spotify API to get recommended tracks based on user preferences.
+
+        Args:
+            mood (str): the mood the user wants for the playlist
+            genre (str): the genre the user wants for the playlist
+            related_artists (list): A list of related artists to get playlist recommendations for
+
+        Returns:
+            list: a list of recommended tracks to be added to the user's playlist
+        """
+        
+        
+        recommendations = self.sp.recommendations(seed_genres=[genre], seed_artists=related_artists, target_valence=self._get_valence_for_mood(mood))
+        return [track['uri'] for track in recommendations['tracks']]
+    
+    
+    def _get_valence_for_mood(self, mood):
+        """Function  _get_valence_for_mood extracts the valence value of the given mood a user chooses
+
+        Args:
+            mood (str): the mood the user inputs as a preference
+        """
+        # Map mood to target valence (a measure of musical positiveness)
+        valence_mapping = {
+            'happy': 0.8,
+            'sad': 0.3,
+            'energetic': 0.7,
+            'calm': 0.5,
+            # Add more mappings as needed
+      }
+        return valence_mapping.get(mood, 0.5)  # Default valence is 0.5 for unknown moods
+   
+    def _create_playlist(self, playlist_name):
+        """Function _create_playlist creates the playlistfor the user to add recommended tracks to.
+
+        Args:
+            playlist_name (str): the name of the playlist to be created
+
+        Returns:
+            _type_: Returns the spotify playlist id of the created playlist
+        """
+        # Create a new public playlist on the user's Spotify account
+        user_id = self.sp.current_user()['id']
+        playlist = self.sp.user_playlist_create(user_id, playlist_name, public=True)
+        return playlist['id']
+
+    def _add_tracks_to_playlist(self, playlist_id, track_uris):
+        """Function _add_tracks_to_playlist adds the recommended tracks previously generated to the user's playlist.
+
+        Args:
+            playlist_id (_type_): The track id of the playlist created
+            track_uris (_type_): The uris of the generated recommended tracks.
+        """
+        # Add tracks to a playlist on the user's Spotify account
+        self.sp.playlist_add_items(playlist_id, track_uris)
+  
+
+
 
 @app.route('/')
 def index():
@@ -51,5 +129,30 @@ def display_playlist(playlist):
     # Render a page displaying the generated playlist
     return render_template('playlist.html', playlist=playlist)
 
+import unittest
+from unittest.mock import MagicMock
+from playlistgenerator import app, SpotifyService
+
+class TestPlaylistGenerator(unittest.TestCase):
+    def setUp(self):
+        app.config['TESTING'] = True
+        self.app = app.test_client()
+
+    def test_generate_playlist(self):
+        # Mock SpotifyService for unit testing
+        spotify_service_mock = MagicMock(spec=SpotifyService)
+        spotify_service_mock.generate_playlist.return_value = "Test Playlist"
+
+        # Replace the original SpotifyService instance with the mock
+        app.spotify_service = spotify_service_mock
+
+        # Simulate POST request with form data
+        response = self.app.post('/generate_playlist', data={'user_input': 'Test Input'})
+
+        # Check if the response contains the generated playlist
+        self.assertIn(b'Test Playlist', response.data)
+
+
 if __name__ == '__main__':
+    unittest.main()
     app.run(debug=True)
