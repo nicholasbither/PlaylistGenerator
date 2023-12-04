@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProducePlaylist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>ProducePlaylist</h1>
+    <div class="mood-selection">
+        <h2>Choose a mood:</h2>
+        <button class="mood-button" id="mood1">happy</button>
+        <button class="mood-button" id="mood2">energetic</button>
+        <button class="mood-button" id="mood3">angry</button>
+    </div>
+    <form action="{{ url_for('generate_playlist_route') }}" method="post">
+        <label for="related-artists">Enter related artists:</label>
+        <input type="text" id="related-artists" name="related-artists" required>
+        <button type="submit">Generate Playlist</button>
+    </form>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
