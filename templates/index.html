@@ -4,22 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProducePlaylist</title>
+    <title>Moodify</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <h1>ProducePlaylist</h1>
+    <h1>Moodify</h1>
     <div class="mood-selection">
         <h2>Choose a mood:</h2>
         <button class="mood-button" id="mood1">happy</button>
         <button class="mood-button" id="mood2">energetic</button>
         <button class="mood-button" id="mood3">angry</button>
+        <button class="mood-button" id="mood4">relax</button>
+        <button class="mood-button" id="mood5">sad</button>
+        <button class="mood-button" id="mood6">calm</button>
+        <button class="mood-button" id="mood7">dance</button>
     </div>
-    <form action="{{ url_for('generate_playlist_route') }}" method="post">
+
+    <div class="side-login">
+        <h1>Spotify Playlist Generator</h1>
+        <button onclick="window.location.href='/login'">Login with Spotify</button>
+    </div>
+    <form action="{{ url_for('generate_playlist') }}" method="post">
+        <input type="hidden" name="access_token" value="{{ access_token }}">
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+        <input type="hidden" name="mood" id="mood-selected">
+        <input type="hidden" name="artist" id="artist-selected">
+        <input type="hidden" name="genre" id="genre-selected">
         <label for="related-artists">Enter related artists:</label>
         <input type="text" id="related-artists" name="related-artists" required>
         <button type="submit">Generate Playlist</button>
     </form>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <h2>Select a Genre</h2>
+
+<select id="genreSelect">
+ <option value="pop">Pop</option>
+ <option value="rock">Rock</option>
+ <option value="jazz">Jazz</option>
+ <option value="blues">Blues</option>
+ <option value="classical">Classical</option>
+ <option value="hiphop">Hip Hop</option>
+ <option value="reggae">Reggae</option>
+ <option value="party">Party</option>
+ <option value="sleep">Sleep</option>
+ <option value="loved">Loved</option>
+ <option value="roadtrip">Roadtrip</option>
+ <option value="run">Run</option>
+ <option value="gym">Gym</option>
+ <option value="study">Study</option>
+ <option value="romance">Romance</option>
+ <option value="mystical">Mystical</option>
+ <option value="punk">Punk</option>
+ <option value="soul">Soul</option>
+ <option value="none">None</option>
+</select>
 </body>
 </html>

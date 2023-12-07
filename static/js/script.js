@@ -18,3 +18,22 @@ document.querySelectorAll('.mood-button').forEach(button => {
         relatedArtistsInput.name = 'related-artists';
     });
 });
+var genreSelect = document.getElementById("genreSelect");
+var selectedGenre = genreSelect.options[genreSelect.selectedIndex].value;
+
+fetch('/generate_playlist', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        access_token: access_token,
+        user_id: user_id,
+        mood: mood,
+        artist: artist,
+        genre: genre
+    })
+})
+.then(response => response.json())
+.then(data => console.log('Success:', data))
+.catch((error) => console.error('Error:', error));
