@@ -22,7 +22,7 @@
 
     <div class="side-login">
         <h1>Spotify Playlist Generator</h1>
-        <button onclick="window.location.href='/login'">Login with Spotify</button>
+        <button onclick="window.location.href='/getTracks'">Get Top 50 Saved Tracks</button>
     </div>
     <form action="{{ url_for('generate_playlist') }}" method="post">
         <input type="hidden" name="access_token" value="{{ access_token }}">
